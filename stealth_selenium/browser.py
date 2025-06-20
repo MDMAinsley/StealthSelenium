@@ -31,8 +31,8 @@ def inject_fingerprint_spoofing(driver):
     driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {"source": spoof_js})
 
 def get_stealth_browser(profile_dir=None, user_data_dir=None, proxy=None, cookie_path=None, load_cookies=False):
-    if not profile_dir and not cookie_path:
-        raise ValueError("Must provide either a Chrome profile or a cookie file path.")
+    if not user_data_dir and not (cookie_path and load_cookies):
+        raise ValueError("You must provide either a Chrome user profile (user_data_dir) or load cookies for stealth.")
 
     options = uc.ChromeOptions()
 
