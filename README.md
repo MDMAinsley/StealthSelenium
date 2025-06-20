@@ -20,7 +20,7 @@ pip install -r requirements.txt
 Or install from GitHub in other projects:
 
 ```bash
-pip install git+https://github.com/YOUR_USER/stealth_selenium.git
+pip install git+https://github.com/MDMAinsley/StealthSelenium.git
 ```
 
 ## Example

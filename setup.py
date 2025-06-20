@@ -8,7 +8,7 @@ setup(
         'undetected-chromedriver',
         'selenium',
     ],
-    author='Your Name',
+    author='MDMAinsley',
     description='Undetectable Selenium wrapper with real browser behavior',
-    url='https://github.com/YOUR_USER/stealth_selenium',
+    url='https://github.com/MDMAinsley/StealthSelenium.git',
 )
