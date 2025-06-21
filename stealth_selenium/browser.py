@@ -44,6 +44,7 @@ def get_stealth_browser(profile_dir=None, user_data_dir=None, proxy=None, cookie
     options.add_argument("--no-first-run")
     options.add_argument("--no-default-browser-check")
     options.add_argument("--disable-blink-features=AutomationControlled")
+    options.add_argument("--remote-debugging-port=0")
     options.headless = False
 
     if proxy:
