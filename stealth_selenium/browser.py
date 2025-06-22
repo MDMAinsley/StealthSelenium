@@ -31,36 +31,41 @@ def inject_fingerprint_spoofing(driver):
     driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {"source": spoof_js})
 
 def get_stealth_browser(profile_dir=None, user_data_dir=None, proxy=None, cookie_path=None, load_cookies=False):
-    if not user_data_dir and not (cookie_path and load_cookies):
-        raise ValueError("You must provide either a Chrome user profile (user_data_dir) or load cookies for stealth.")
+    try:
+        if not user_data_dir and not (cookie_path and load_cookies):
+            raise ValueError("You must provide either a Chrome user profile (user_data_dir) or load cookies for stealth.")
 
-    options = uc.ChromeOptions()
+        options = uc.ChromeOptions()
 
-    if user_data_dir:
-        options.add_argument(f'--user-data-dir={user_data_dir}')
-    if profile_dir:
-        options.add_argument(f'--profile-directory={profile_dir}')
+        if user_data_dir:
+            options.add_argument(f'--user-data-dir={user_data_dir}')
+        if profile_dir:
+            options.add_argument(f'--profile-directory={profile_dir}')
 
-    options.add_argument("--no-first-run")
-    options.add_argument("--no-default-browser-check")
-    options.add_argument("--disable-blink-features=AutomationControlled")
-    options.add_argument("--remote-debugging-port=0")
-    options.headless = False
+        options.add_argument("--no-first-run")
+        options.add_argument("--no-default-browser-check")
+        options.add_argument("--disable-blink-features=AutomationControlled")
+        options.add_argument("--remote-debugging-port=0")
+        options.headless = False
 
-    if proxy:
-        options.add_argument(f'--proxy-server={proxy}')
+        if proxy:
+            options.add_argument(f'--proxy-server={proxy}')
 
-    driver = uc.Chrome(options=options)
-    inject_fingerprint_spoofing(driver)
+        print("YORT")
+        driver = uc.Chrome(options=options)
+        print("YEET")
+        inject_fingerprint_spoofing(driver)
 
-    if load_cookies and cookie_path:
-        try:
-            load_cookies_from_file(driver, cookie_path)
-            logger.info("Loaded cookies from %s", cookie_path)
-        except Exception as e:
-            logger.warning("Failed to load cookies: %s", str(e))
+        if load_cookies and cookie_path:
+            try:
+                load_cookies_from_file(driver, cookie_path)
+                logger.info("Loaded cookies from %s", cookie_path)
+            except Exception as e:
+                logger.warning("Failed to load cookies: %s", str(e))
 
-    return driver
+        return driver
+    except Exception as e:
+        print(f"FATAL ERROR: {e}")
 
 def save_cookies_to_file(driver, path):
     cookies = driver.get_cookies()
