@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='stealth_selenium',
-    version='0.52',
+    version='1.0',
     packages=find_packages(),
     install_requires=[
         'undetected-chromedriver',

@@ -55,13 +55,11 @@ def get_stealth_browser(profile_dir=None, user_data_dir=None, proxy=None, cookie
         if proxy:
             options.add_argument(f'--proxy-server={proxy}')
 
-        print("YORT")
         driver = uc.Chrome(
             options=options,
             driver_executable_path="D:/ChromeVersions/ChromeDriver-137.0.7151.119/chromedriver-win64/chromedriver.exe",
             browser_executable_path="D:/ChromeVersions/Chrome-137.0.7151.119/chrome-win64/chrome.exe"
         )
-        print("YEET")
 
         inject_fingerprint_spoofing(driver)
 
