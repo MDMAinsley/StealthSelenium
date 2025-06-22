@@ -33,11 +33,10 @@ def inject_fingerprint_spoofing(driver):
 def get_stealth_browser(profile_dir=None, user_data_dir=None, proxy=None, cookie_path=None, load_cookies=False):
     try:
         if not user_data_dir and not (cookie_path and load_cookies):
-            raise ValueError("You must provide either a Chrome user profile (user_data_dir) or load cookies for stealth.")
+            raise ValueError("You must provide either a Chrome user profile (user_data_dir) or"
+                             " load cookies for stealth.")
 
         options = uc.ChromeOptions()
-
-        print(f"UC Driver Path: {uc.Chrome().driver_path}")
 
         if user_data_dir:
             options.add_argument(f'--user-data-dir={user_data_dir}')
