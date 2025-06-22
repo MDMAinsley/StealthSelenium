@@ -59,7 +59,7 @@ def get_stealth_browser(profile_dir=None, user_data_dir=None, proxy=None, cookie
         driver = uc.Chrome(options=options)
         print("YEET")
 
-        inject_fingerprint_spoofing(driver)
+        # inject_fingerprint_spoofing(driver)
 
         if load_cookies and cookie_path:
             try:
@@ -71,6 +71,7 @@ def get_stealth_browser(profile_dir=None, user_data_dir=None, proxy=None, cookie
         return driver
     except Exception as e:
         print(f"FATAL ERROR: {e}")
+        return None
 
 def save_cookies_to_file(driver, path):
     cookies = driver.get_cookies()
