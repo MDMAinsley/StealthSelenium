@@ -43,14 +43,13 @@ def get_stealth_browser(profile_dir=None, user_data_dir=None, proxy=None, cookie
         if profile_dir:
             options.add_argument(f'--profile-directory={profile_dir}')
 
-        options.add_argument("--no-first-run")
-        options.add_argument("--no-default-browser-check")
         options.add_argument("--disable-blink-features=AutomationControlled")
-        options.add_argument("--disable-features=ChromeWhatsNewUI,Translate")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
-        options.add_argument("--disable-gpu")
-        options.add_argument("--remote-debugging-port=9222")
+        # options.add_argument("--no-first-run")
+        # options.add_argument("--no-default-browser-check")
+        # options.add_argument("--disable-features=ChromeWhatsNewUI,Translate")
+        # options.add_argument("--no-sandbox")
+        # options.add_argument("--disable-dev-shm-usage")
+        # options.add_argument("--disable-gpu")
         options.headless = False
 
         if proxy:
