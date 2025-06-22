@@ -37,6 +37,8 @@ def get_stealth_browser(profile_dir=None, user_data_dir=None, proxy=None, cookie
 
         options = uc.ChromeOptions()
 
+        print(f"UC Driver Path: {uc.Chrome().driver_path}")
+
         if user_data_dir:
             options.add_argument(f'--user-data-dir={user_data_dir}')
         if profile_dir:
@@ -45,7 +47,11 @@ def get_stealth_browser(profile_dir=None, user_data_dir=None, proxy=None, cookie
         options.add_argument("--no-first-run")
         options.add_argument("--no-default-browser-check")
         options.add_argument("--disable-blink-features=AutomationControlled")
-        options.add_argument("--remote-debugging-port=0")
+        options.add_argument("--disable-features=ChromeWhatsNewUI,Translate")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-gpu")
+        options.add_argument("--remote-debugging-port=9222")
         options.headless = False
 
         if proxy:
@@ -54,6 +60,7 @@ def get_stealth_browser(profile_dir=None, user_data_dir=None, proxy=None, cookie
         print("YORT")
         driver = uc.Chrome(options=options)
         print("YEET")
+
         inject_fingerprint_spoofing(driver)
 
         if load_cookies and cookie_path:
