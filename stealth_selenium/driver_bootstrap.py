@@ -7,49 +7,61 @@ import zipfile
 def get_installed_chrome_version():
     try:
         output = subprocess.check_output(
-            r'reg query "HKCU\Software\Google\Chrome\BLBeacon" /v version',
+            r'reg query "HKCU\\Software\\Google\\Chrome\\BLBeacon" /v version',
             shell=True
         ).decode()
         match = re.search(r"version\s+REG_SZ\s+([^\s]+)", output)
         return match.group(1) if match else None
     except Exception as e:
-        print(f"⚠ Could not detect Chrome version: {e}")
+        print(f"⚠ Could not detect system Chrome version: {e}")
         return None
 
-def get_or_download_chromedriver(storage_dir="drivers"):
-    version = get_installed_chrome_version()
-    if not version:
-        print("⚠ No installed Chrome version detected.")
-        return None
+def download_chromedriver(driver_ver, out_dir):
+    zip_url = f"https://chromedriver.storage.googleapis.com/{driver_ver}/chromedriver_win32.zip"
+    zip_path = os.path.join(out_dir, "chromedriver.zip")
+    with open(zip_path, "wb") as f:
+        f.write(requests.get(zip_url).content)
+    with zipfile.ZipFile(zip_path, "r") as zip_ref:
+        zip_ref.extractall(out_dir)
+    os.remove(zip_path)
 
-    major = version.split('.')[0]
-    release_url = f"https://chromedriver.storage.googleapis.com/LATEST_RELEASE_{major}"
-    resp = requests.get(release_url)
-    driver_version = "Empty"
+def download_chrome_binary(driver_ver, out_dir):
+    zip_url = f"https://storage.googleapis.com/chrome-for-testing-public/{driver_ver}/win64/chrome-win64.zip"
+    zip_path = os.path.join(out_dir, "chrome.zip")
+    with open(zip_path, "wb") as f:
+        f.write(requests.get(zip_url).content)
+    with zipfile.ZipFile(zip_path, "r") as zip_ref:
+        zip_ref.extractall(out_dir)
+    os.remove(zip_path)
 
-    print("Driver metadata response:", resp.text[:200])
+def ensure_driver_and_browser():
+    fallback_url = "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"
+    chrome_version = get_installed_chrome_version()
+    if not chrome_version:
+        print("⚠ Chrome version not detected — using fallback ChromeDriver.")
+        driver_ver = requests.get(fallback_url).text.strip()
+    else:
+        major = chrome_version.split('.')[0]
+        release_url = f"https://chromedriver.storage.googleapis.com/LATEST_RELEASE_{major}"
+        resp = requests.get(release_url)
+        if resp.status_code != 200 or "<Error>" in resp.text:
+            print(f"❌ No ChromeDriver for system Chrome {chrome_version} — using fallback.")
+            driver_ver = requests.get(fallback_url).text.strip()
+        else:
+            driver_ver = resp.text.strip()
 
-    if resp.status_code != 200 or "<Error>" in resp.text:
-        print(f"❌ No ChromeDriver available for version: {version} — falling back.")
-        latest_resp = requests.get("https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
-        fallback_version = latest_resp.text.strip()
-        print(f"🔁 Using fallback ChromeDriver: {fallback_version}")
-        driver_version = fallback_version
+    base_path = os.path.join("stealth_selenium", "bin", f"Chrome_{driver_ver}")
+    os.makedirs(base_path, exist_ok=True)
 
-    target_dir = os.path.join(storage_dir, f"ChromeDriver_{driver_version}")
-    os.makedirs(target_dir, exist_ok=True)
-    exe_path = os.path.join(target_dir, "chromedriver.exe")
+    driver_path = os.path.join(base_path, "chromedriver.exe")
+    browser_path = os.path.join(base_path, "chrome-win64", "chrome.exe")
 
-    if not os.path.exists(exe_path):
-        zip_url = f"https://chromedriver.storage.googleapis.com/{driver_version}/chromedriver_win32.zip"
-        zip_path = os.path.join(target_dir, "driver.zip")
-        with open(zip_path, "wb") as f:
-            f.write(requests.get(zip_url).content)
-        with zipfile.ZipFile(zip_path, "r") as zip_ref:
-            zip_ref.extractall(target_dir)
-        os.remove(zip_path)
+    if not os.path.exists(driver_path):
+        print(f"⬇ Downloading ChromeDriver {driver_ver}...")
+        download_chromedriver(driver_ver, base_path)
 
-    return exe_path
+    if not os.path.exists(browser_path):
+        print(f"⬇ Downloading Chrome binary {driver_ver}...")
+        download_chrome_binary(driver_ver, base_path)
 
-if __name__ == "__main__":
-    get_or_download_chromedriver()
+    return driver_path, browser_path

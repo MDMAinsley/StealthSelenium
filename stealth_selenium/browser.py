@@ -1,7 +1,7 @@
 import undetected_chromedriver as uc
 import logging
 import json
-from .driver_bootstrap import get_or_download_chromedriver
+from .driver_bootstrap import ensure_driver_and_browser
 
 
 logger = logging.getLogger(__name__)
@@ -64,14 +64,14 @@ def get_stealth_browser(profile_dir=None, user_data_dir=None, proxy=None, cookie
         if proxy:
             options.add_argument(f'--proxy-server={proxy}')
 
-        driver_path = get_or_download_chromedriver()
+        driver_path, browser_path = ensure_driver_and_browser()
         if not driver_path:
             raise RuntimeError("Could not resolve ChromeDriver path.")
 
         driver = uc.Chrome(
             options=options,
-            driver_executable_path=driver_path
-            # browser_executable_path left unset unless user overrides
+            driver_executable_path=driver_path,
+            browser_executable_path=browser_path
         )
 
         inject_fingerprint_spoofing(driver)
