@@ -1,6 +1,8 @@
 import undetected_chromedriver as uc
 import logging
 import json
+from .driver_bootstrap import get_or_download_chromedriver
+
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -32,6 +34,13 @@ def inject_fingerprint_spoofing(driver):
 
 def get_stealth_browser(profile_dir=None, user_data_dir=None, proxy=None, cookie_path=None, load_cookies=False):
     try:
+        from .find_chrome_profiles import prompt_profile_selection
+
+        if profile_dir is None and user_data_dir is None:
+            profile_dir, user_data_dir = prompt_profile_selection()
+            if not user_data_dir:
+                raise RuntimeError("No valid Chrome profile selected.")
+
         if not user_data_dir and not (cookie_path and load_cookies):
             raise ValueError("You must provide either a Chrome user profile (user_data_dir) or"
                              " load cookies for stealth.")
@@ -55,10 +64,14 @@ def get_stealth_browser(profile_dir=None, user_data_dir=None, proxy=None, cookie
         if proxy:
             options.add_argument(f'--proxy-server={proxy}')
 
+        driver_path = get_or_download_chromedriver()
+        if not driver_path:
+            raise RuntimeError("Could not resolve ChromeDriver path.")
+
         driver = uc.Chrome(
             options=options,
-            driver_executable_path="D:/ChromeVersions/ChromeDriver-137.0.7151.119/chromedriver-win64/chromedriver.exe",
-            browser_executable_path="D:/ChromeVersions/Chrome-137.0.7151.119/chrome-win64/chrome.exe"
+            driver_executable_path=driver_path
+            # browser_executable_path left unset unless user overrides
         )
 
         inject_fingerprint_spoofing(driver)
