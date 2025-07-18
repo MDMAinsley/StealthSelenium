@@ -19,11 +19,22 @@ def get_installed_chrome_version():
 def get_or_download_chromedriver(storage_dir="drivers"):
     version = get_installed_chrome_version()
     if not version:
+        print("⚠ No installed Chrome version detected.")
         return None
 
     major = version.split('.')[0]
     release_url = f"https://chromedriver.storage.googleapis.com/LATEST_RELEASE_{major}"
-    driver_version = requests.get(release_url).text.strip()
+    resp = requests.get(release_url)
+    driver_version = "Empty"
+
+    print("Driver metadata response:", resp.text[:200])
+
+    if resp.status_code != 200 or "<Error>" in resp.text:
+        print(f"❌ No ChromeDriver available for version: {version} — falling back.")
+        latest_resp = requests.get("https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
+        fallback_version = latest_resp.text.strip()
+        print(f"🔁 Using fallback ChromeDriver: {fallback_version}")
+        driver_version = fallback_version
 
     target_dir = os.path.join(storage_dir, f"ChromeDriver_{driver_version}")
     os.makedirs(target_dir, exist_ok=True)
@@ -39,3 +50,6 @@ def get_or_download_chromedriver(storage_dir="drivers"):
         os.remove(zip_path)
 
     return exe_path
+
+if __name__ == "__main__":
+    get_or_download_chromedriver()
