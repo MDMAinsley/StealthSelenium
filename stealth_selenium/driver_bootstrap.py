@@ -6,12 +6,21 @@ import zipfile
 
 def get_installed_chrome_version():
     try:
-        output = subprocess.check_output(
-            r'reg query "HKCU\\Software\\Google\\Chrome\\BLBeacon" /v version',
-            shell=True
-        ).decode()
-        match = re.search(r"version\s+REG_SZ\s+([^\s]+)", output)
-        return match.group(1) if match else None
+        paths = [
+            r'reg query "HKCU\Software\Google\Chrome\BLBeacon" /v version',
+            r'reg query "HKLM\Software\Google\Chrome\BLBeacon" /v version',
+            r'reg query "HKLM\Software\WOW6432Node\Google\Chrome\BLBeacon" /v version'
+        ]
+        for cmd in paths:
+            try:
+                output = subprocess.check_output(cmd, shell=True).decode()
+                match = re.search(r"version\s+REG_SZ\s+([^\s]+)", output)
+                if match:
+                    return match.group(1)
+            except subprocess.CalledProcessError:
+                continue
+        print("⚠ Chrome registry keys not found.")
+        return None
     except Exception as e:
         print(f"⚠ Could not detect system Chrome version: {e}")
         return None
