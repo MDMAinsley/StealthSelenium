@@ -5,6 +5,7 @@ import tempfile
 
 def find_chrome_profiles():
     base_path = os.path.expanduser(r"~\AppData\Local\Google\Chrome\User Data")
+
     if not os.path.exists(base_path):
         print("⚠ Chrome profile directory not found.")
         return []
@@ -12,7 +13,7 @@ def find_chrome_profiles():
     profiles = []
     for folder in os.listdir(base_path):
         full_path = os.path.join(base_path, folder)
-        if folder.lower().startswith("profile") or folder == "default":
+        if folder.lower().startswith("profile") or folder.lower() == "default":
             pref_file = os.path.join(full_path, "Preferences")
             if os.path.exists(pref_file):
                 try:
@@ -72,3 +73,8 @@ def validate_cloned_profile(temp_dir, profile_folder):
         return "profile" in prefs and prefs["profile"].get("name")
     except:
         return False
+
+
+# if __name__ == "__main__":
+#     ret1, ret2 = prompt_profile_selection()
+#     print(ret1, ret2)
